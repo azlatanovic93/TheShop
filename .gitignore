@@ -1,0 +1,4 @@
+# ignore this folders
+TheShop/bin
+TheShop/obj
+.vs/
