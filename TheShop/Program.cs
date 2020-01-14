@@ -11,9 +11,11 @@ namespace TheShop
 
 			try
 			{
-				//order and sell
-				_shopService.OrderAndSellArticle(1, 20, 10);
+                //order and sell
+                _shopService.OrderAndSellArticle(1, 20, 10);
                 _shopService.OrderAndSellArticle(1, 520, 10);
+                _shopService.OrderAndSellArticle(7, 620, 10);
+                _shopService.OrderAndSellArticle(7 ,220, 10);
             }
 			catch (Exception ex)
 			{

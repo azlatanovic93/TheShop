@@ -25,52 +25,73 @@ namespace TheShop
 		}
 
 		public void OrderAndSellArticle(int id, int maxExpectedPrice, int buyerId)
-		{
-			#region ordering article
+        {
+            #region ordering article
 
-			Article article = null;
-			var articlesInInventory = _suppliers.Where(s => s.ArticleInInventory(id)).ToArray();
-			if (articlesInInventory.Length > 0)
-			{
-				var minPrice = articlesInInventory.Min(s => s.GetArticle(id).ArticlePrice);
-				article = articlesInInventory.Select(s => s.GetArticle(id))
-                    .FirstOrDefault(s => s.ArticlePrice == minPrice && s.ArticlePrice <= maxExpectedPrice);
-			}
+            Article article = OrderArticle(id, maxExpectedPrice);
 
-			#endregion
+            #endregion
 
-			#region selling article
+            #region selling article
 
-			if (article == null)
-			{
-				throw new Exception("Could not order article");
-			}
+            SellArticle(id, buyerId, article);
 
-			_logger.Debug("Trying to sell article with ID = " + id);
+            #endregion
+        }
+
+        private void SellArticle(int id, int buyerId, Article article)
+        {
+            try
+            {
+                if (article == null)
+                {
+                    throw new Exception("Could not order article");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return;
+            }
+
+            _logger.Debug("Trying to sell article with ID = " + id);
 
             //_suppliers.Where(s => s.GetArticle(id).NameOfArticle == article.NameOfArticle).; //  s.GetArticle(id).IsSold = true);
 
-			article.IsSold = true;
-			article.SoldDate = DateTime.Now;
-			article.BuyerUserId = buyerId;
+            article.IsSold = true;
+            article.SoldDate = DateTime.Now;
+            article.BuyerUserId = buyerId;
             _suppliers.ForEach(s => s.UpdateArticle(article));
 
-			try
-			{
-				_databaseDriver.Save(article);
-				_logger.Info("Article with ID = " + id + " is sold.");
-			}
-			catch (Exception)
-			{
-				string errorMessage = "Could not save article with ID = " + id;
-				_logger.Error(errorMessage);
-				throw new Exception(errorMessage);
-			}
+            try
+            {
+                _databaseDriver.Save(article);
+                _logger.Info("Article with ID = " + id + " is sold.");
+            }
+            catch (Exception)
+            {
+                string errorMessage = "Could not save article with ID = " + id;
+                _logger.Error(errorMessage);
+                Console.WriteLine(errorMessage);
+                //throw new Exception(errorMessage);
+            }
+        }
 
-			#endregion
-		}
+        private Article OrderArticle(int id, int maxExpectedPrice)
+        {
+            Article article = null;
+            var articlesInInventory = _suppliers.Where(s => s.ArticleInInventory(id)).ToArray();
+            if (articlesInInventory.Length > 0)
+            {
+                var minPrice = articlesInInventory.Min(s => s.GetArticle(id).ArticlePrice);
+                article = articlesInInventory.Select(s => s.GetArticle(id))
+                    .FirstOrDefault(s => s.ArticlePrice == minPrice && s.ArticlePrice <= maxExpectedPrice);
+            }
 
-		public Article GetById(int id)
+            return article;
+        }
+
+        public Article GetById(int id)
 		{
 			return _databaseDriver.GetById(id);
 		}

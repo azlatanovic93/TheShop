@@ -34,12 +34,13 @@ namespace TheShop.Suppliers
 
         public bool ArticleInInventory(int id)
 		{
-            foreach(Article article in _articles)
+            Article article = GetArticle(id);
+            if(article != null)
             {
-                if (article.IsSold)
-                    return false;
+                if (!article.IsSold)
+                    return true;
             }
-			return true;
+			return false;
 		}
 		
 		public Article GetArticle(int id)
