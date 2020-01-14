@@ -6,5 +6,8 @@ namespace TheShop.Suppliers
 	{
 		bool ArticleInInventory(int id);
 		Article GetArticle(int id);
+        void UpdateArticle(Article article);
+        bool CompareArticles(Article article1, Article article2);
+        
 	}
 }

@@ -13,7 +13,8 @@ namespace TheShop
 			{
 				//order and sell
 				_shopService.OrderAndSellArticle(1, 20, 10);
-			}
+                _shopService.OrderAndSellArticle(1, 520, 10);
+            }
 			catch (Exception ex)
 			{
 				Console.WriteLine(ex);

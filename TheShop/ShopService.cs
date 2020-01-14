@@ -29,11 +29,12 @@ namespace TheShop
 			#region ordering article
 
 			Article article = null;
-			var articlesInInventory = _suppliers.Where(s => s.ArticleInInventory(id) && !s.GetArticle(id).IsSold).ToArray();
+			var articlesInInventory = _suppliers.Where(s => s.ArticleInInventory(id)).ToArray();
 			if (articlesInInventory.Length > 0)
 			{
 				var minPrice = articlesInInventory.Min(s => s.GetArticle(id).ArticlePrice);
-				article = articlesInInventory.Select(s => s.GetArticle(id)).First(s => s.ArticlePrice == minPrice);
+				article = articlesInInventory.Select(s => s.GetArticle(id))
+                    .FirstOrDefault(s => s.ArticlePrice == minPrice && s.ArticlePrice <= maxExpectedPrice);
 			}
 
 			#endregion
@@ -47,9 +48,12 @@ namespace TheShop
 
 			_logger.Debug("Trying to sell article with ID = " + id);
 
+            //_suppliers.Where(s => s.GetArticle(id).NameOfArticle == article.NameOfArticle).; //  s.GetArticle(id).IsSold = true);
+
 			article.IsSold = true;
 			article.SoldDate = DateTime.Now;
 			article.BuyerUserId = buyerId;
+            _suppliers.ForEach(s => s.UpdateArticle(article));
 
 			try
 			{
